@@ -1,0 +1,6 @@
+﻿firstname,lastname,username,department,password,ou
+Edward,Franklin,E.Franklin,Sales,P@ssword,"OU=CSV_Users,DC=sheridan-ra,DC=local"
+Bill,Jackson,B.Jackson,HR,P@ssword,"OU=CSV_Users,DC=sheridan-ra,DC=local"
+Christine,Alasco,C.Alasco,Administration,P@ssword,"OU=CSV_Users,DC=sheridan-ra,DC=local"
+Rogino,Apacible,R.Apacible,Administration,P@ssword,"OU=CSV_Users,DC=sheridan-ra,DC=local"
+Izzie,Stevens,I.Stevens,Supplies,P@ssword,"OU=CSV_Users,DC=sheridan-ra,DC=local"
