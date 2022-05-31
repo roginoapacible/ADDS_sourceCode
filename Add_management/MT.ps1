@@ -113,9 +113,19 @@ ForEach-Object `
 }
 #>
 
-#2.1 Local PC to Domain Controller
+<#2.1 Local PC to Domain Controller
 $dc = "sheridan-ra.local" # Specify the domain to join.
 $pw = "P@ssword" | ConvertTo-SecureString -asPlainText -Force # Specify the password for the domain admin.
 $usr = "$dc\administrator" # Specify the domain admin account.
 $creds = New-Object System.Management.Automation.PSCredential($usr,$pw)
 add-computer -DomainName $dc -credential $creds -restart -force -verbose # Note that the computer will be restarted automatically
+#>
+
+#2.2 remote to DC
+Resolve-DnsName 192.168.10.13 #expose remote hostname
+$dc = "sheridan-ra.local"
+$pw = "P@ssword" | ConvertTo-SecureString -asPlainText -Force
+$usr = "$dc\administrator"
+$pc = "DESKTOP-NI90JJ8" # Specify the computer that should be joined to the domain.
+$creds = New-Object System.Management.Automation.PSCredential($usr,$pw)
+Add-Computer -ComputerName $pc -LocalCredential $pc\vmadmin -DomainName $dc -Credential $creds -Verbose -Restart -Force
