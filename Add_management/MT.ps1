@@ -86,7 +86,29 @@ foreach($User in $ADUsers)`
 }
 #>
 
-#1.7 create computer object
+<#1.7 create computer object
+Test-NetConnection 192.168.10.13 -InformationLevel Detailed #windows10 client in fast server
+Resolve-DnsName 192.168.10.13 #expose computer name
+$computerName = "DESKTOP-NI90JJ8"
+New-ADComputer `
+-Name $computerName `
+-SamAccountName $computerName `
+-path "OU=NewComputers,DC=sheridan-ra,DC=local"
+#>
 
 
+<#1.8 import compObj from CSV
+Resolve-DnsName 192.168.10.11 #expose srv01 name
+Resolve-DnsName 192.168.10.13 #expose win10_client name
 
+$File="C:\Users\Administrator\Downloads\import_computers.csv" # Specify the import CSV position.
+$Path="OU=NewComputers,DC=sheridan-ra,DC=local" # Specify the path to the OU.
+Import-Csv -Path $File | `
+ForEach-Object `
+{`
+    New-ADComputer `
+    -Name $_.ComputerName `
+    -Path $Path `
+    -Enabled $True `
+}
+#>

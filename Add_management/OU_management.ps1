@@ -5,7 +5,7 @@ Get-ADOrganizationalUnit -Filter 'Name -like "*"' | Format-Table Name, Distingui
 
 #Create OU(option for accidental delete)..important to set the path
 
-New-ADOrganizationalUnit "CSV_Users" -Path "DC=sheridan-ra,DC=local" #no protect
+New-ADOrganizationalUnit "NewComputers" -Path "DC=sheridan-ra,DC=local" #no protect
 New-ADOrganizationalUnit "ChildOU" -Path "OU=OU-test,DC=sheridan-ra,dc=local" -ProtectedFromAccidentalDeletion $False #$true
 
 #set OU protections
