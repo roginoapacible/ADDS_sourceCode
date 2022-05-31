@@ -118,7 +118,6 @@ $dc = "sheridan-ra.local" # Specify the domain to join.
 $pw = "P@ssword" | ConvertTo-SecureString -asPlainText -Force # Specify the password for the domain admin.
 $usr = "$dc\Administrator" # Specify the domain admin account.
 $creds = New-Object System.Management.Automation.PSCredential($usr,$pw)
-Add-Computer -DomainName $dc -credential -server $creds -restart -force # Note that the computer will be restarted automatically.
+add-computer -DomainName $dc -credential $creds -restart -force -verbose # Note that the computer will be restarted automatically
 
-Add-computer -domainname sheridan-ra -credential
 
