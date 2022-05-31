@@ -119,3 +119,4 @@ $pw = "P@ssword" | ConvertTo-SecureString -asPlainText -Force # Specify the pass
 $usr = "$dc\Administrator" # Specify the domain admin account.
 $creds = New-Object System.Management.Automation.PSCredential($usr,$pw)
 Add-Computer -DomainName $dc -Credential $creds -restart -force -verbose # Note that the computer will be restarted automatically.
+
