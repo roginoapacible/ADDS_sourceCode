@@ -2,6 +2,13 @@
 #add windows feature
 Add-WindowsFeature ad-domain-services -IncludeManagementTools #ad-domain-services
 
+
+
+#no RSAT
+Add-WindowsFeature RSAT-role-tools -IncludeAllSubFeature
+
+
+
 #heck windows feature
 get-windowsfeature -name *AD*
 
@@ -16,3 +23,6 @@ install-addsforest -domainname sheridan-ra.local
 #check domain controller connected to the system
 Get-ADDomainController -discover
 ###------------------------------
+
+get-windowsfeature 
+
