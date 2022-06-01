@@ -121,7 +121,7 @@ $creds = New-Object System.Management.Automation.PSCredential($usr,$pw)
 add-computer -DomainName $dc -credential $creds -restart -force -verbose # Note that the computer will be restarted automatically
 #>
 
-#2.2 remote to DC
+<#2.2 remote to DC
 Resolve-DnsName 192.168.10.13 #expose remote hostname
 $dc = "sheridan-ra.local"
 $pw = "P@ssword" | ConvertTo-SecureString -asPlainText -Force
@@ -129,3 +129,44 @@ $usr = "$dc\administrator"
 $pc = "DESKTOP-NI90JJ8" # Specify the computer that should be joined to the domain.
 $creds = New-Object System.Management.Automation.PSCredential($usr,$pw)
 Add-Computer -ComputerName $pc -LocalCredential $pc\vmadmin -DomainName $dc -Credential $creds -Verbose -Restart -Force
+#>
+
+#2.3 join multiple remote from dc
+$dc = "Sheridan-ra.local"
+$pw = "P@ssword" | ConvertTo-SecureString -asPlainText -Force
+$usr = "$dc\Administrator"
+$creds = New-Object System.Management.Automation.PSCredential($usr,$pw)
+$pcname = 'WIN-GDO4MDI2UCO','DESKTOP-NI90JJ8'#specify computer name
+$pcuser = 'Administrator','vmadmin' # Specify computers username
+$count = $pcname.Count
+for($i = 0; $i -le $count) 
+{
+     $a = $pcname[$i]
+     $b = $pcuser[$i]
+    Add-Computer -ComputerName $a -LocalCredential $a\$b -DomainName $dc -credential $creds -Verbose -Restart -Force 
+    $i++
+}
+
+<#Get-WmiObject -ComputerName WIN-GDO4MDI2UCO -Class win32_OperatingSystem
+Get-WmiObject -ComputerName 192.168.10.13 -Class win32_OperatingSystem -Credential $Credential
+#>
+
+<#2.4 join multiple computers from domain using CSV
+$dc = "Sheridan-ra.local"
+$pw = "P@ssword" | ConvertTo-SecureString -asPlainText -Force
+$usr = "$dc\Administrator"
+$pc = Get-Content -Path C:\Users\Administrator\Downloads\import_computers.txt # Specify the path to the computers list. `
+$creds = New-Object System.Management.Automation.PSCredential($usr,$pw)
+Add-Computer -ComputerName $pc -LocalCredential `
+$pc\admin -DomainName `
+$dc -Credential `
+$creds -Restart -Force
+#>
+
+<#2.5 remove computers remotely domain-
+$dc = "Sheridan-ra.local" 
+$pw = "P@ssword" | ConvertTo-SecureString -asPlainText -Force 
+$usr = "$dc\Administrator" 
+$pc = "WIN-GDO4MDI2UCO" 
+$creds = New-Object System.Management.Automation.PSCredential($usr,$pw) Remove-Computer -ComputerName $pc -Credential $creds -Verbose -Restart -Force
+#>
