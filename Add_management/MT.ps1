@@ -169,10 +169,33 @@ for($i = 0; $i -le $count)
 }
 #>
 
-#2.5 remove computers remotely domain-
-$dc = "Sheridan-ra.local" 
-$pw = "P@ssword" | ConvertTo-SecureString -asPlainText -Force 
-$usr = "$dc\Administrator" 
-$pc = "DESKTOP-NI90JJ8" 
+<#2.5 remove computers remotely domain-
+$dc = "Sheridan-ra.local"
+$pw = "P@ssword" | ConvertTo-SecureString -asPlainText -Force
+$usr = "$dc\Administrator"
+$pc = "DESKTOP-NI90JJ8"
 $creds = New-Object System.Management.Automation.PSCredential($usr,$pw)
-Remove-Computer -ComputerName $pc -Credential $creds -Verbose -Restart -Force
+Remove-Computer -ComputerName $pc -LocalCredential $pc\vmadmin -Credential $creds -restart -force -passthru -Verbose
+#Restart-Computer -computername "DESKTOP-NI90JJ8" -Force
+#>
+
+<#3.1 rename a computer(must be online and connected to DC)
+get-adcomputer -Filter * | Format-Table name, DistinguishedName #expose computer name in the domain
+Rename-Computer -ComputerName "DESKTOP-NI90JJ8" -NewName "win10-Client" -DomainCredential sheridan-ra\Administrator -Force -restart -Verbose
+#>
+
+<#3.2 joining computer to the domain
+Resolve-DnsName 192.168.10.11 #expose remote hostname
+$NewComputerName = "winServer01" # Specify the new computer name. 
+$DC = "sheridan-ra.local" # Specify the domain to join. 
+$Path = "OU=ServerPC,DC=sheridan-ra,DC=local" # Specify the path to the OU where to put the computer account in the domain. 
+Add-Computer -computername "WIN-GDO4MDI2UCO" -DomainName $DC -DomainCredential $DC\administrator -LocalCredential .\administrator -OUPath $Path -NewName $NewComputerName -Restart -Force -verbose
+#>
+
+<#4 Reseting a computer account
+get-adcomputer -Filter 'Name -like "*"' | Format-Table Name, DistinguishedName -a #search computers
+$pc = read-host -Prompt “Input computer name to reset“ # Specify the computer name. 
+$pw = read-host -Prompt “Input random characters for temp password“ -AsSecureString # Specify the password. 
+Get-ADComputer $pc | Set-ADAccountPassword -NewPassword:$pw -Reset:$true -Verbose
+Restart-Computer -computername $pc -credential $pc\ -Force -Verbose
+#>
