@@ -199,3 +199,87 @@ $pw = read-host -Prompt “Input random characters for temp password“ -AsSecur
 Get-ADComputer $pc | Set-ADAccountPassword -NewPassword:$pw -Reset:$true -Verbose
 Restart-Computer -computername $pc -credential $pc\ -Force -Verbose
 #>
+
+<#5 Disabling User and Computer Accounts
+Get-ADUser -filter * | Format-List Name, enabled, SamAccountName, DistinguishedName #get users list
+get-aduser -Identity R.Apacible #get user properties 
+Disable-AdAccount -Identity R.Apacible
+#>
+
+<#5.1 Disable computers in bulk using a list in a text file
+Get-ADComputer -Filter 'Name -like "*"' -Properties IPv4Address | Fl Name,DNSHostName, SamAccountName, enabled, DistinguishedName
+
+$Pclist = Get-Content C:\Users\Administrator\Downloads\import_computers.txt # Specify the path to the computer list. 
+Foreach($pc in $Pclist) `
+{ Disable-ADAccount -Identity "$pc$" 
+Get-ADComputer -Identity "$pc" | Move-ADObject -TargetPath “OU=disabledPC,DC=sheridan-ra,DC=local” }
+#>
+
+<#6 deleting a Computer from Active Directory
+#for objects, use guid
+Get-ADComputer -Filter 'Name -like "*"' -Properties IPv4Address | Fl Name,DNSHostName, SamAccountName, enabled, DistinguishedName, objectguid, IPv4Address
+$id = "cf65cae9-7fa3-436d-a0c4-566845d8bb15"
+Remove-ADObject -Identity $id
+#>
+
+<#7.1 create ad group
+New-ADGroup -Name "NewStudents" -SamAccountName NewStudents -GroupCategory Security -GroupScope Global -DisplayName "New Students" -Path "OU=Groups,DC=sheridan-ra,DC=local" -Description "Members of this group are New Students CST-ITIS"
+#>
+
+<#7.2 remove ad group
+Remove-ADGroup -Identity NewStudents
+#>
+
+<#8 add members to group
+$students = Get-ADUser -Filter 'name -like "students*"' -SearchBase "OU=BulkUsers,DC=sheridan-ra,DC=local"
+$Group = Get-ADGroup -filter * -SearchBase "OU=Groups,DC=sheridan-ra,DC=local"
+Add-ADGroupMember -Identity $Group -Members $students
+#>
+
+
+<#8.1
+Get-ADGroupMember -Identity NewStudents | Format-Table name
+
+#8.2
+Add-AdGroupMember -Identity NewStudents -Members R.Apacible
+#>
+
+#9
+Remove-ADGroupMember -Identity NewStudents -Members R.Apacible
+
+#9.1 enable ad recycle bin
+Enable-ADOptionalFeature 'Recycle Bin Feature' -Scope ForestOrConfigurationSet -Target sheridan-ra.local
+
+#10 Moving Users and Computers to a New Organizational Unit
+Get-ADUser -Filter  'Name -like "*"' | Format-Table Name, DistinguishedName -a 
+
+Get-ADOrganizationalUnit -Filter 'Name -like "*"' | Format-Table Name, DistinguishedName -a 
+
+Move-ADObject -Identity "CN=Rogino Apacible,OU=CSV_Users,DC=sheridan-ra,DC=local" -TargetPath "OU=NewUsers,DC=sheridan-ra,DC=local"
+
+
+<#10.1 move comptuer
+get-adcomputer -Filter 'Name -like "*"' | Format-Table Name, DistinguishedName -a 
+
+Get-ADOrganizationalUnit -Filter 'Name -like "*"' | Format-Table Name, DistinguishedName -a 
+
+Move-ADObject -Identity "CN=WINSERVER01,OU=disabledPC,DC=sheridan-ra,DC=local" -TargetPath "OU=ServerPC,DC=sheridan-ra,DC=local"
+#>
+
+#10.2 move AD user accounts listed in a CSV file
+#Specify target OU. This is where users will be moved. 
+$TargetOU = "OU=Districts,OU=IT,DC=enterprise,DC=com" 
+# Specify CSV path. Import CSV file and assign it to a variable
+$Imported_csv = Import-Csv -Path "C:\temp\MoveList.csv" $Imported_csv | ForEach-Object`
+{ # Retrieve DN of user. 
+    $UserDN = (Get-ADUser -Identity $_.Name).distinguishedName 
+    # Move user to target OU. 
+    Move-ADObject -Identity $UserDN -TargetPath $TargetOU }
+
+#10.2 export to csv
+get-aduser -filter * -SearchBase "OU=BulkUsers,DC=sheridan-ra,DC=local"  | Select-Object -Property name | export-csv -path C:\Users\Administrator\Downloads\movelist.csv
+$a = import-csv -Path C:\Users\Administrator\Downloads\movelist.csv
+
+#10.3 export to text
+get-aduser -filter * -SearchBase "OU=BulkUsers,DC=sheridan-ra,DC=local"  | Select-Object -Property name | Out-File -path C:\Users\Administrator\Downloads\movelist.txt
+$a = Get-Content -Path C:\Users\Administrator\Downloads\movelist.txt
