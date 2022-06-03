@@ -7,7 +7,7 @@ Get-ADOrganizationalUnit -Filter *| Format-Table Name, DistinguishedName -a
 
 #Create OU(option for accidental delete)..important to set the path
 
-New-ADOrganizationalUnit "ServerPC" -Path "DC=sheridan-ra,DC=local" #no protect
+New-ADOrganizationalUnit "Groups" -Path "DC=sheridan-ra,DC=local" #no protect
 New-ADOrganizationalUnit "ChildOU" -Path "OU=OU-test,DC=sheridan-ra,dc=local" -ProtectedFromAccidentalDeletion $False #$true
 
 #set OU protections

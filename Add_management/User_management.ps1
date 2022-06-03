@@ -1,12 +1,12 @@
 ###User Management--------------------------------------
 #check current users in the domain
-Get-ADUser -Filter * #-SearchBase "OU=Finance,OU=UserAccounts,DC=FABRIKAM,DC=COM"
+Get-ADUser -Filter  'Name -like "*"' | Format-Table Name, DistinguishedName -a 
 
 #new user(disabled by default)
 New-ADUser user1 -UserPrincipalName user1@sheridan-ra.local
 
 #check user properties
-Get-ADUser B.Johnson
+Get-ADUser R.Apacible
 
 #set password(individual)
 Set-ADAccountPassword -Identity user1
